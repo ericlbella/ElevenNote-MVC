@@ -55,25 +55,25 @@ namespace ElevenNote.Services
                 return query.ToArray();
             }
         }
-            public NoteDetail GetNoteById(int id)
+        public NoteDetail GetNoteById(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
             {
-                using (var ctx = new ApplicationDbContext())
-                {
-                    var entity =
-                        ctx
-                            .Notes
-                            .Single(e => e.NoteId == id && e.OwnerId == _userId);
-                    return
-                        new NoteDetail
-                        {
-                            NoteId = entity.NoteId,
-                            Title = entity.Title,
-                            Content = entity.Content,
-                            CreatedUtc = entity.CreatedUtc,
-                            ModifiedUtc = entity.ModifiedUtc
-                        };
-                }
+                var entity =
+                    ctx
+                        .Notes
+                        .Single(e => e.NoteId == id && e.OwnerId == _userId);
+                return
+                    new NoteDetail
+                    {
+                        NoteId = entity.NoteId,
+                        Title = entity.Title,
+                        Content = entity.Content,
+                        CreatedUtc = entity.CreatedUtc,
+                        ModifiedUtc = entity.ModifiedUtc
+                    };
             }
+        }
 
         public bool UpdateNote(NoteEdit model)
         {
@@ -92,7 +92,21 @@ namespace ElevenNote.Services
             }
         }
 
-    }
+        public bool DeleteNote(int noteId)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .Notes
+                        .Single(e => e.NoteId == noteId && e.OwnerId == _userId);
 
+                ctx.Notes.Remove(entity);
+
+                return ctx.SaveChanges() == 1;
+            }
+
+        }
     }
+}
 
